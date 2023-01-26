@@ -12,6 +12,15 @@ import java.util.Set;
 
 public class StudyDashboard {
 
+    /**
+     * 변수 이름 바꾸기
+     * Rename Variable
+     *   - 더 많이 사용되는 변수일수록 그 이름이 더 중요하다
+     *     - 람다식에서 사용하는 변수 vs 함수의 매개변수
+     *   - 다이나믹 타입을 지원하는 언어에서는 타입을 이름에 넣기도 한다
+     *   - 여러 함수에 걸쳐 쓰이는 필드 이름에는 더 많이 고민하고 이름을 짓는다
+     */
+
     private Set<String> usernames = new HashSet<>();
 
     private Set<String> reviews = new HashSet<>();
@@ -25,10 +34,11 @@ public class StudyDashboard {
         GHRepository repository = gitHub.getRepository("whiteship/live-study");
         GHIssue issue = repository.getIssue(30);
 
-        List<GHIssueComment> comments = issue.getComments();
-        for (GHIssueComment comment : comments) {
-            usernames.add(comment.getUserName());
-            this.reviews.add(comment.getBody());
+        // 이슈의 댓글목록을 불러오긴 하지만, 리뷰를 읽어오는 함수인데 그 안에 리뷰가 아무것도 없어서 뭔가 부자연스러움 comments -> reviews, comment -> review
+        List<GHIssueComment> reviews = issue.getComments();
+        for (GHIssueComment review : reviews) {
+            usernames.add(review.getUserName());
+            this.reviews.add(review.getBody());
         }
     }
 
@@ -43,7 +53,7 @@ public class StudyDashboard {
     public static void main(String[] args) throws IOException {
         StudyDashboard studyDashboard = new StudyDashboard();
         studyDashboard.loadReviews();
-        studyDashboard.getUsernames().forEach(name -> System.out.println(name));
-        studyDashboard.getReviews().forEach(review -> System.out.println(review));
+        studyDashboard.getUsernames().forEach(System.out::println); // => 람다표현식을 메소드 레퍼런스로 변경함으로써 매개변수의 이름을 딱히 고민 X (인텔리제이에서는 권장하는 줄이 표시됨)
+        studyDashboard.getReviews().forEach(System.out::println); // => 람다표현식을 메소드 레퍼런스로 변경함으로써 매개변수의 이름을 딱히 고민 X (인텔리제이에서는 권장하는 줄이 표시됨)
     }
 }

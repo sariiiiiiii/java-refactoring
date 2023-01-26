@@ -10,18 +10,17 @@ import java.util.Set;
 
 public class ReviewerDashboard extends Dashboard {
 
+    /**
+     * printReviewers의 구현들을 printUsernames로 함수 추출하고 매개변수로 int eventId 추가
+     * @throws IOException
+     */
+
+    // pull up method로 올리기
+    // Pull members up
     public void printReviewers() throws IOException {
-        // Get github issue to check homework
-        Set<String> reviewers = new HashSet<>();
-        GitHub gitHub = GitHub.connect();
-        GHRepository repository = gitHub.getRepository("whiteship/live-study");
-        GHIssue issue = repository.getIssue(30);
-
-        // Get reviewers
-        issue.getComments().forEach(c -> reviewers.add(c.getUserName()));
-
-        // Print reviewers
-        reviewers.forEach(System.out::println);
+        // Get GitHub issue to check homework
+//        super.printUsernames(30);
+        printUsernames(30); // static import
     }
 
 }
