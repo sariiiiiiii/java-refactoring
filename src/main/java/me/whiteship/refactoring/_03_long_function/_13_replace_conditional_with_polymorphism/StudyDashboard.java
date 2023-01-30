@@ -14,6 +14,16 @@ import java.util.concurrent.Executors;
 
 public class StudyDashboard {
 
+    /**
+     * 조건문을 다형성으로 바꾸기
+     * Replace Conditional with Polymorphism
+     *
+     * - 여러 타입에 따라 각기 다른 로직으로 처리해야 하는 경우에 다형성을 적용해서 조건문을 보다 명확하게 분리할 수 있다.
+     *   (예, 책, 음악, 음식 등...) 반복되는 swtich문을 각기 다른 클래스를 만들어 제거할 수 있다
+     * - 공통으로 사용되는 로직은 상위클래스에 두고 달라지는 부분만 하위클래스에 둠으로써, 달라지는 부분만 강조할 수 있다
+     * - 모든 조건문을 다형성으로 바꿔야 하는 것은 아니다
+     */
+
     private final int totalNumberOfEvents;
     private final List<Participant> participants;
 
@@ -27,9 +37,16 @@ public class StudyDashboard {
         studyDashboard.print();
     }
 
+    /**
+     * 분기별로 로직이 짜여져있는것이 아닌 type에 따라 상속받은 하위클래스의 메소드 실행
+     * 하지만 분기처리가 없어진게 아니라 type이 나뉘어지는 분기처리는 언제나 존재 (동적으로 실행되는 로직을 나누고 싶을때 팩토리 메소드 활용 !)
+     */
     private void print() throws IOException, InterruptedException {
         checkGithubIssues(getGhRepository());
-        new StudyPrinter(this.totalNumberOfEvents, this.participants, PrinterMode.MARKDOWN).execute();
+//        new StudyPrinter(this.totalNumberOfEvents, this.participants, PrinterMode.MARKDOWN).execute();
+        new CvsPrinter(this.totalNumberOfEvents, this.participants).execute();
+        new ConsolePrinter(this.totalNumberOfEvents, this.participants).execute();
+        new MarkdownPrinter(this.totalNumberOfEvents, this.participants).execute();
     }
 
     private GHRepository getGhRepository() throws IOException {

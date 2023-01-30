@@ -16,12 +16,23 @@ import java.util.concurrent.Executors;
 
 public class StudyDashboard {
 
+    /**
+     * 반복문 쪼개기
+     * Split Loop
+     *
+     * 하나의 반복문에서 여러 다른 작업을 하는 코드를 쉽게 찾아볼 수 있다
+     * 해당 반복문을 수정할 때 여러 작업을 모두 고려하며 코딩을 해야한다
+     * 반복문을 여러개로 쪼개면 보다 쉽게 이해하고 수정할 수 있다
+     * 성능 문제를 야기할 수 있지만, "리팩토링"은 "성능 최적화"와 별개의 작업이다. 리팩토링을 마친 이후에 성능 최적화를 시도할 수 있다
+     */
+
     private final int totalNumberOfEvents;
     private final List<Participant> participants;
     private final Participant[] firstParticipantsForEachEvent;
 
     public StudyDashboard(int totalNumberOfEvents) {
         this.totalNumberOfEvents = totalNumberOfEvents;
+        // CopyWriteArrayList()를 사용한 이유는 멀티쓰레드를 사용하면서 해당 리스트가 수정이 되고 있는데 (add)
         participants = new CopyOnWriteArrayList<>();
         firstParticipantsForEachEvent = new Participant[this.totalNumberOfEvents];
     }
@@ -32,11 +43,19 @@ public class StudyDashboard {
     }
 
     private void print() throws IOException, InterruptedException {
-        GHRepository ghRepository = getGhRepository();
+//        GHRepository ghRepository = getGhRepository();
 
+        // 해당 for문은 병렬처리를 하기 위한 멀티쓰레드 로직이다
+        // 이 for문을 추출할 경우 넘겨줘야할 파라미터가 굉장히 많다
+        checkGithubIssues(getGhRepository()); // 인라인 리팩토링
+
+        new StudyPrinter(this.totalNumberOfEvents, this.participants).execute();
+        printFirstParticipants();
+    }
+
+    private void checkGithubIssues(GHRepository ghRepository) throws InterruptedException {
         ExecutorService service = Executors.newFixedThreadPool(8);
         CountDownLatch latch = new CountDownLatch(totalNumberOfEvents);
-
         for (int index = 1 ; index <= totalNumberOfEvents ; index++) {
             int eventId = index;
             service.execute(new Runnable() {
@@ -45,20 +64,18 @@ public class StudyDashboard {
                     try {
                         GHIssue issue = ghRepository.getIssue(eventId);
                         List<GHIssueComment> comments = issue.getComments();
-                        Date firstCreatedAt = null;
-                        Participant first = null;
 
-                        for (GHIssueComment comment : comments) {
-                            Participant participant = findParticipant(comment.getUserName(), participants);
-                            participant.setHomeworkDone(eventId);
 
-                            if (firstCreatedAt == null || comment.getCreatedAt().before(firstCreatedAt)) {
-                                firstCreatedAt = comment.getCreatedAt();
-                                first = participant;
-                            }
-                        }
+                        /**
+                         * 반복문 쪼개기
+                         * for문의 기능을 각각의 for문으로 쪼개고 관련해서 사용할 변수를 위치에 맞춰주고 firstCreatedAt, first 변수를 사용하는 로직위에 위치하도록 함
+                         * 그 후, 메소드 추출
+                         */
 
-                        firstParticipantsForEachEvent[eventId - 1] = first;
+                        checkHomework(comments, participants, eventId);
+//                        Participant first = findFirst(comments);
+                        firstParticipantsForEachEvent[eventId - 1] = findFirst(comments); // 인라인 리팩토링
+
                         latch.countDown();
                     } catch (IOException e) {
                         throw new IllegalArgumentException(e);
@@ -69,9 +86,27 @@ public class StudyDashboard {
 
         latch.await();
         service.shutdown();
+    }
 
-        new StudyPrinter(this.totalNumberOfEvents, this.participants).execute();
-        printFirstParticipants();
+    private void checkHomework(List<GHIssueComment> comments, List<Participant> participants, int eventId) {
+        for (GHIssueComment comment : comments) {
+            Participant participant = findParticipant(comment.getUserName(), participants);
+            participant.setHomeworkDone(eventId);
+        }
+    }
+
+    private Participant findFirst(List<GHIssueComment> comments) throws IOException {
+        Date firstCreatedAt = null;
+        Participant first = null;
+        for (GHIssueComment comment : comments) {
+            Participant participant = findParticipant(comment.getUserName(), participants);
+
+            if (firstCreatedAt == null || comment.getCreatedAt().before(firstCreatedAt)) {
+                firstCreatedAt = comment.getCreatedAt();
+                first = participant;
+            }
+        }
+        return first;
     }
 
     private void printFirstParticipants() {

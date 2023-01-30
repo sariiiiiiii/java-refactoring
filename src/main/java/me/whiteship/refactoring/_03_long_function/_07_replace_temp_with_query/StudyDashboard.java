@@ -17,6 +17,14 @@ import java.util.concurrent.Executors;
 
 public class StudyDashboard {
 
+    /**
+     * 임시 변수를 질의 함수로 바꾸기
+     * Replace Temp With Query(여기에서 query란 함수를 의미)
+     *
+     * - 변수를 사용하면 반복해서 동일한 식을 계산하는 것을 피할 수 있고, 이름을 사용해 의미를 표현할 수도 있다
+     * - 긴 함수를 리팩토링할 때, 그러한 임시 변수를 함수로 추출하여 분리한다면 빼낸 함수로 전달해야 할 매개변수를 줄일 수 있다
+     */
+
     public static void main(String[] args) throws IOException, InterruptedException {
         StudyDashboard studyDashboard = new StudyDashboard();
         studyDashboard.print();
@@ -72,15 +80,34 @@ public class StudyDashboard {
             writer.print(header(totalNumberOfEvents, participants.size()));
 
             participants.forEach(p -> {
-                long count = p.homework().values().stream()
-                        .filter(v -> v == true)
-                        .count();
-                double rate = count * 100 / totalNumberOfEvents;
 
-                String markdownForHomework = String.format("| %s %s | %.2f%% |\n", p.username(), checkMark(p, totalNumberOfEvents), rate);
+                /**
+                 * 임시변수를 쿼리(함수)로 전환
+                 * rate 추출하는 함수를 함수 추출하기로 만들고 getMarkdownForParticipant 메소드에서 파라미터로 전달
+                 * double rate라는 임시변수를 getRate라는 값을 계산하는 함수로 빼냈을 때, 얻을 수 있는 장점 (파라미터를 줄일 수 있다)
+                 * 우리가 추출하는 메소드의 기존 파라미터를 파악할 수 있는 정보라면 이 방식으로 빼내어서 파라미터를 줄일 수 있음
+                 */
+//                double rate = getRate(totalNumberOfEvents, p);
+
+                // 한 줄 마크다운 출력
+                // rate를 파라미터로 넘겨주는 것이 아니라 rate를 계산하는 함수를 넘겨주는 쪽에서 파라미터로 전달 getMardownForParticipant 함수에서 rate 계산하는 함수 파라미터로 전달
+                String markdownForHomework = getMarkdownForParticipant(totalNumberOfEvents, p);
+
                 writer.print(markdownForHomework);
             });
         }
+    }
+
+    private double getRate(int totalNumberOfEvents, Participant p) {
+        long count = p.homework().values().stream()
+                .filter(v -> v == true)
+                .count();
+        double rate = count * 100 / totalNumberOfEvents;
+        return rate;
+    }
+
+    private String getMarkdownForParticipant(int totalNumberOfEvents, Participant p) {
+        return String.format("| %s %s | %.2f%% |\n", p.username(), checkMark(p, totalNumberOfEvents), getRate(totalNumberOfEvents, p));
     }
 
     /**
