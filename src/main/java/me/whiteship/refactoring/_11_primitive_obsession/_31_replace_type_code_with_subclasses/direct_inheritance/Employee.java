@@ -21,7 +21,9 @@ public abstract class Employee {
 
     public static Employee createEmployee(String name, String type) {
         return switch (type) {
-            case "engineer", "manager", "salesman" -> new Enginner(name);
+            case "engineer" -> new Enginner(name);
+            case "manager" -> new Manager(name);
+            case "salesman" -> new Salesman(name);
             default -> throw new IllegalArgumentException(type);
         };
     }
