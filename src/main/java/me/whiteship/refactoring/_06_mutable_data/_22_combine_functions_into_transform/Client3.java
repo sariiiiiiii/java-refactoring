@@ -8,12 +8,12 @@ public class Client3 {
     private double basicChargeAmount;
 
     public Client3(Reading reading) {
-        this.basicChargeAmount = calculateBaseCharge(reading);
+        this.basicChargeAmount = new ReadingClient().enrichReading(reading).baseCharge();
     }
 
-    private double calculateBaseCharge(Reading reading) {
-        return baseRate(reading.month(), reading.year()) * reading.quantity();
-    }
+//    private double calculateBaseCharge(Reading reading) {
+//        return baseRate(reading.month(), reading.year()) * reading.quantity();
+//    }
 
     private double baseRate(Month month, Year year) {
         return 10;

@@ -4,15 +4,41 @@ import java.util.List;
 
 public class Criminal {
 
-    public String alertForMiscreant(List<Person> people) {
+    /**
+     * 단순 조회와 사이드이팩트 함수를 나누자
+     */
+    
+    // 사이드이팩트 로직
+    public void alertForMiscreant(List<Person> people) {
+
+        /**
+         * people을 찾는일을 findMiscreant()에서 똑같이 하고 있다
+         */
+
+        if (findMiscreant(people).isBlank()) {
+            setOffAlarms();
+        }
+
+//        for (Person p : people) {
+//            if (p.getName().equals("Don")) {
+//                setOffAlarms();
+//            }
+//
+//            if (p.getName().equals("John")) {
+//                setOffAlarms();
+//            }
+//        }
+
+    }
+
+    // 단순 조회 로직
+    public String findMiscreant(List<Person> people) {
         for (Person p : people) {
             if (p.getName().equals("Don")) {
-                setOffAlarms();
                 return "Don";
             }
 
             if (p.getName().equals("John")) {
-                setOffAlarms();
                 return "John";
             }
         }

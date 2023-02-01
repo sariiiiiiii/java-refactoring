@@ -8,9 +8,11 @@ class EmployeeTest {
 
     @Test
     void employeeType() {
-        assertEquals("engineer", new Employee("keesun", "engineer").getType());
-        assertEquals("manager", new Employee("keesun", "manager").getType());
-        assertThrows(IllegalArgumentException.class, () -> new Employee("keesun", "wrong type"));
+        assertEquals("engineer", Employee.createEmployee("sari", "engineer"));
+        assertEquals("manager", Employee.createEmployee("sari", "manager"));
+        assertEquals("salesman", Employee.createEmployee("sari", "salesman"));
+//        assertEquals("manager", new Employee("keesun", "manager").getType());
+        assertThrows(IllegalArgumentException.class, () -> Employee.createEmployee("sari", "wrong type"));
     }
 
 }

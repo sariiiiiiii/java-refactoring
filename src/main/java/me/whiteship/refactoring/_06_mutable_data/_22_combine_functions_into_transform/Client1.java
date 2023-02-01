@@ -8,7 +8,7 @@ public class Client1 {
     double baseCharge;
 
     public Client1(Reading reading) {
-        this.baseCharge = baseRate(reading.month(), reading.year()) * reading.quantity();
+        this.baseCharge = new ReadingClient().enrichReading(reading).baseCharge();
     }
 
     private double baseRate(Month month, Year year) {
