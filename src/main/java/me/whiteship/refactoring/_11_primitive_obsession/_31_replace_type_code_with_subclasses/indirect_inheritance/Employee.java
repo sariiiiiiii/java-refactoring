@@ -6,30 +6,44 @@ public class Employee {
 
     private String name;
 
-    private String type;
+//    private String type;
+//    private String typeValue; // type -> typeValue rename
 
-    public Employee(String name, String type) {
-        this.validate(type);
+    private EmployeeType type;
+
+    public Employee(String name, String typeValue) {
+//        this.validate(typeValue);
         this.name = name;
-        this.type = type;
+//        this.typeValue = typeValue;
+        this.type = this.employeeType(typeValue);
     }
 
-    private void validate(String type) {
-        List<String> legalTypes = List.of("engineer", "manager", "salesman");
-        if (!legalTypes.contains(type)) {
-            throw new IllegalArgumentException(type);
-        }
+    private EmployeeType employeeType(String typeValue) {
+        return switch (typeValue) {
+            case "engineer" -> new Enginner();
+            case "manager" -> new Manager();
+            case "salesman" -> new Salesman();
+            default -> throw new IllegalArgumentException("error");
+        };
     }
+
+//    private void validate(String type) {
+//        List<String> legalTypes = List.of("engineer", "manager", "salesman");
+//        if (!legalTypes.contains(type)) {
+//            throw new IllegalArgumentException(type);
+//        }
+//    }
 
     public String capitalizedType() {
-        return this.type.substring(0, 1).toUpperCase() + this.type.substring(1).toLowerCase();
+//        return this.typeValue.substring(0, 1).toUpperCase() + this.typeValue.substring(1).toLowerCase(); // EmployeeType 쪽으로 위임할 수 있음
+        return this.type.capitalizedType();
     }
 
     @Override
     public String toString() {
         return "Employee{" +
                 "name='" + name + '\'' +
-                ", type='" + type + '\'' +
+                ", type='" + type.toString() + '\'' +
                 '}';
     }
 }

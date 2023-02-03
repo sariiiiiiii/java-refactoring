@@ -2,31 +2,42 @@ package me.whiteship.refactoring._11_primitive_obsession._32_replace_conditional
 
 import java.util.List;
 
-public class Employee {
+public abstract class Employee {
 
-    private String type;
+//    protected String type;
 
-    private List<String> availableProjects;
+    protected List<String> availableProjects;
+
+    public Employee() {
+    }
 
     public Employee(String type, List<String> availableProjects) {
-        this.type = type;
+//        this.type = type;
         this.availableProjects = availableProjects;
     }
 
-    public int vacationHours() {
-        return switch (type) {
-            case "full-time" -> 120;
-            case "part-time" -> 80;
-            case "temporal" -> 32;
-            default -> 0;
-        };
+    public Employee(List<String> availableProjects) {
+        this.availableProjects = availableProjects;
     }
 
+    public abstract int vacationHours();
+
     public boolean canAccessTo(String project) {
-        return switch (type) {
-            case "full-time" -> true;
-            case "part-time", "temporal" -> this.availableProjects.contains(project);
-            default -> false;
-        };
+
+        /**
+         * 하위클래스에서 canAccessTo 메소드에 대해 return을 해주고 있기 때문에 상위클래스에서는 default에 해당하는 값만 return
+         */
+
+//        return switch (type) {
+//            case "full-time" -> true;
+//            case "part-time", "temporal" -> this.availableProjects.contains(project);
+//            default -> false;
+//        };
+
+        /**
+         * PartTimeEmployee와 TemporalEmployee는 canAccessTo가 같은 코드이기때문에 따로 구현을 안해도됨
+         */
+
+        return this.availableProjects.contains(project);
     }
 }
