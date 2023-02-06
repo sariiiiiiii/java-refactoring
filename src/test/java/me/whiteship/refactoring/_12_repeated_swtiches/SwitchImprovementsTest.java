@@ -7,9 +7,18 @@ import static org.junit.jupiter.api.Assertions.*;
 class SwitchImprovementsTest {
 
     @Test
-    void vacationHours() {
+    void vacationHoursSwitchStatement() {
         SwitchImprovements si = new SwitchImprovements();
-        assertEquals(120, si.vacationHours("full-time"));
+        assertEquals(120, si.vacationHoursSwitchStatement("full-time"));
+    }
+
+    @Test
+    void vacationHoursSwitchExpression() {
+        SwitchImprovements si = new SwitchImprovements();
+        assertEquals(120, si.vacationHoursSwitchExpression("full-time"));
+        assertEquals(80, si.vacationHoursSwitchExpression("part-time"));
+        assertEquals(32, si.vacationHoursSwitchExpression("temporal"));
+        assertEquals(0, si.vacationHoursSwitchExpression("sari"));
     }
 
 }
